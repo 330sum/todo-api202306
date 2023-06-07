@@ -21,6 +21,16 @@ public class TodoController {
 
     private final TodoService todoService;
 
+    // 할 일 목록요청 (GET)
+    @GetMapping
+    public ResponseEntity<?> retrieveTodoList() {
+        log.info("/api/todos GET request!");
+
+        TodoListResponseDTO responseDTO = todoService.retrieve();
+
+        return ResponseEntity.ok().body(responseDTO);
+    }
+
     // 할 일 등록 요청
     @PostMapping
     public ResponseEntity<?> createTodo(
@@ -70,15 +80,6 @@ public class TodoController {
         }
     }
 
-    // 할 일 목록요청 (GET)
-    @GetMapping
-    public ResponseEntity<?> retrieveTodoList() {
-        log.info("/api/todos GET request!");
-
-        TodoListResponseDTO responseDTO = todoService.retrieve();
-
-        return ResponseEntity.ok().body(responseDTO);
-    }
 
     // 할 일 수정요청 (PUT, PATCH)
     @RequestMapping(method = {RequestMethod.PUT, RequestMethod.PATCH})
