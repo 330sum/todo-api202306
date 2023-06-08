@@ -17,6 +17,7 @@ import javax.servlet.http.HttpServletRequest;
 @Slf4j
 @RequiredArgsConstructor
 @RequestMapping("/api/todos")
+@CrossOrigin(origins =  "http://localhost:3000")
 public class TodoController {
 
     private final TodoService todoService;
@@ -79,7 +80,6 @@ public class TodoController {
                     .body(TodoListResponseDTO.builder().error(e.getMessage()));
         }
     }
-
 
     // 할 일 수정요청 (PUT, PATCH)
     @RequestMapping(method = {RequestMethod.PUT, RequestMethod.PATCH})
