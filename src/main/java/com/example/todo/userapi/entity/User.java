@@ -6,15 +6,19 @@ import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.StringTokenizer;
 
-@Setter @Getter @ToString
-@EqualsAndHashCode(of ="id")
-@NoArgsConstructor @AllArgsConstructor
+@Setter
+@Getter
+@ToString
+@EqualsAndHashCode(of = "id")
+@NoArgsConstructor
+@AllArgsConstructor
 @Builder
 
 @Entity
-@Table(name="tbl_user")
-public class User  {
+@Table(name = "tbl_user")
+public class User {
 
     @Id
     @Column(name = "user_id")
@@ -33,6 +37,17 @@ public class User  {
 
     @CreationTimestamp
     private LocalDateTime joinDate;
+
+//    public void test() {
+//        String test = "";
+//        String[] s = test.split(" ");
+//
+//
+//        StringTokenizer st = new StringTokenizer(test);
+//        // 서울시 강남구 ㅇ어
+//        st.nextToken();
+//        String s1 = st.nextToken();
+//    }
 
 }
 
