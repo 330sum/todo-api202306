@@ -1,5 +1,6 @@
 package com.example.todo.userapi.dto.response;
 
+import com.example.todo.userapi.entity.Role;
 import com.example.todo.userapi.entity.User;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
