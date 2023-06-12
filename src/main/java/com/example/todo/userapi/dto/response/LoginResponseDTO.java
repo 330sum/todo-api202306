@@ -17,7 +17,7 @@ import java.time.LocalDateTime;
 public class LoginResponseDTO {
 
     private String email;
-    private String username;
+    private String userName;
 
     @JsonFormat(pattern = "yyyy년 MM월 dd일")
     private LocalDate joinDate;
@@ -28,7 +28,7 @@ public class LoginResponseDTO {
 
     public LoginResponseDTO(User user, String token) {
         this.email = user.getEmail();
-        this.username = user.getUserName();
+        this.userName = user.getUserName();
         this.joinDate = LocalDate.from(user.getJoinDate());
         this.token = token;
     }
