@@ -1,6 +1,7 @@
 package com.example.todo.userapi.entity;
 
 import lombok.*;
+import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.GenericGenerator;
 
@@ -37,6 +38,10 @@ public class User {
 
     @CreationTimestamp
     private LocalDateTime joinDate;
+
+    @Enumerated(EnumType.STRING)
+    @ColumnDefault("'COMMON'") // @ColumnDefault은 항상 "" string임. 근데enum인 경우 반드시 '' 홑따옴표로 감싸줘야함!!!!!!!!!!!!!!!!!!!!!!
+    private Role role; // 유저 권한
 
 //    public void test() {
 //        String test = "";

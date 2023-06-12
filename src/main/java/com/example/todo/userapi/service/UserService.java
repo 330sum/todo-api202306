@@ -3,8 +3,9 @@ package com.example.todo.userapi.service;
 import com.example.todo.auth.TokenProvider;
 import com.example.todo.exception.DuplcatedEmailException;
 import com.example.todo.exception.NoRegisteredArgumentsException;
-import com.example.todo.userapi.dto.LoginRequestDTO;
+import com.example.todo.userapi.dto.request.LoginRequestDTO;
 import com.example.todo.userapi.dto.request.UserRequestSignUpDTO;
+import com.example.todo.userapi.dto.response.LoginResponseDTO;
 import com.example.todo.userapi.dto.response.UserSignUpResponseDTO;
 import com.example.todo.userapi.entity.User;
 import com.example.todo.userapi.repository.UserRepository;
@@ -63,7 +64,7 @@ public class UserService {
 
 
     // 회원 인증
-    public void authenticate(final LoginRequestDTO dto) {
+    public LoginResponseDTO authenticate(final LoginRequestDTO dto) {
 
         // 이메일을 통해서 회원 정보를 조회
         User user = userRepository.findByEmail(dto.getEmail())
@@ -86,7 +87,9 @@ public class UserService {
         // 로그인 성공 후 클라이언트에게 뭘 리턴할 것인가?
         // -> JWT(Json Web Token)을 클라이언트에게 발급해줘야함
         // 여기서 토큰발급 코드를 쓰면 SRP위반, 객체지향적이지 않기 떄문에, 토큰발급객체 따로 생성(auth 패키지)
-
+        String token = tokenProvider.createToken(user);
+        // 이미 암호화 되어있기 때문에 바로 클라이언트에게 줘도 됨
+        return new LoginResponseDTO(user, token);
 
 
     }
