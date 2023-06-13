@@ -1,6 +1,8 @@
 package com.example.todo.auth;
 
+import com.example.todo.userapi.entity.Role;
 import com.example.todo.userapi.entity.User;
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
@@ -56,7 +58,7 @@ public class TokenProvider {
         // 추가 클레임 정의
         HashMap<String, Object> claims = new HashMap<>();
         claims.put("email", userEntity.getEmail());
-        claims.put("role", userEntity.getRole());
+        claims.put("role", userEntity.getRole().toString()); // enum으로 넣을 때는 String으로 넣기! (안그럼 에러남)
 
         // 토큰 생성
         return Jwts.builder()
@@ -73,6 +75,33 @@ public class TokenProvider {
                 .setExpiration(expiry) // exp: 토큰만료시간
                 .setSubject(userEntity.getId()) // sub: 토큰을 식별할 수 있는 주요데이터
                 .compact();
+    }
+
+    /**
+     * 클라이언트가 전송한 토큰을 디코딩(암호화 해제)하여 토큰의 위조여부를 확인
+     * 토큰을 json으로 파싱해서 클레임(토큰정보)를 리턴
+     * @param token
+     * @return - 토큰 안에 있는 인증된 유저정보를 반환
+     */
+    public TokenUserInfo validatedAndGetTokenUserInfo(String token) {
+
+        // 디코딩(암호화 해제)
+        Claims claims = Jwts.parserBuilder()
+                // 토큰 발급자의 발급 당시의 서명을 넣어줌
+                .setSigningKey(Keys.hmacShaKeyFor(SECRET_KEY.getBytes()))
+                .build()
+                // 여기까지가 서명위조 검사작업 임 (위조된 경우, 예외가 발생함)
+                // 위조가 되지 않은 경우, 페이로드(클레임)을 리턴 -> 페이로드의 클레임을 파싱함 -> 클레임 리턴
+                .parseClaimsJws(token)
+                .getBody();
+
+        log.info("claims: {}", claims);
+
+        return TokenUserInfo.builder()
+                .userId(claims.getSubject()) // id는 Subject안에 넣었음
+                .email(claims.get("email", String.class)) //map으로 들어갔으니까, String클래스로 꺼내야함
+                .role(Role.valueOf(claims.get("role", String.class))) //map으로 들어갔으니까, String클래스로 꺼내야함 -> 근데 enum이니까 한번 더 변환 필요
+                .build();
     }
 
 
