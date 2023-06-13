@@ -28,7 +28,7 @@ public class UserRequestSignUpDTO {
     @Size(min = 2, max = 5)
     private String userName;
 
-    // 엔터티로 변경하는 메서드
+    // 엔터티로 변경하는 메서드 (세터 사용하지 말고 빌더로 사용하기! -> 왜? enum이 builder로 기본값들어가기 때문)
     public User toEntity() {
         return User.builder()
                 .email(this.email)

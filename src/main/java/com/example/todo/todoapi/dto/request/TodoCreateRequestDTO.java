@@ -1,6 +1,7 @@
 package com.example.todo.todoapi.dto.request;
 
 import com.example.todo.todoapi.entity.Todo;
+import com.example.todo.userapi.entity.User;
 import lombok.*;
 
 import javax.validation.constraints.NotBlank;
@@ -21,6 +22,14 @@ public class TodoCreateRequestDTO {
     public Todo toEntity() {
         return Todo.builder()
                 .title(this.title)
+                .build();
+    }
+
+    // 오버로딩으로 만듦 (테스트 다 망가지는 경우떄문에) 안정화되면 위에꺼 삭제
+    public Todo toEntity(User user) {
+        return Todo.builder()
+                .title(this.title)
+                .user(user) // 유저id 넣는게 아니라, user 객체
                 .build();
     }
 }

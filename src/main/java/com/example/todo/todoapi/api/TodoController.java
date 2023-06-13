@@ -1,5 +1,6 @@
 package com.example.todo.todoapi.api;
 
+import com.example.todo.auth.TokenUserInfo;
 import com.example.todo.todoapi.dto.request.TodoCreateRequestDTO;
 import com.example.todo.todoapi.dto.request.TodoModifyRequestDTO;
 import com.example.todo.todoapi.dto.response.TodoListResponseDTO;
@@ -7,6 +8,7 @@ import com.example.todo.todoapi.service.TodoService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -24,10 +26,13 @@ public class TodoController {
 
     // 할 일 목록요청 (GET)
     @GetMapping
-    public ResponseEntity<?> retrieveTodoList() {
+    public ResponseEntity<?> retrieveTodoList(
+            // 토큰에 인증된 사용자 정보를 불러올 수 있음
+            @AuthenticationPrincipal TokenUserInfo userInfo
+    ) {
         log.info("/api/todos GET request!");
 
-        TodoListResponseDTO responseDTO = todoService.retrieve();
+        TodoListResponseDTO responseDTO = todoService.retrieve(userInfo.getUserId());
 
         return ResponseEntity.ok().body(responseDTO);
     }
@@ -35,7 +40,8 @@ public class TodoController {
     // 할 일 등록 요청
     @PostMapping
     public ResponseEntity<?> createTodo(
-            @Validated @RequestBody TodoCreateRequestDTO requestDTO
+            @AuthenticationPrincipal TokenUserInfo userInfo
+            , @Validated @RequestBody TodoCreateRequestDTO requestDTO
             , BindingResult result
     ) {
         if (result.hasErrors()) {
@@ -46,7 +52,7 @@ public class TodoController {
         }
 
         try {
-            TodoListResponseDTO responseDTO = todoService.create(requestDTO);
+            TodoListResponseDTO responseDTO = todoService.create(requestDTO, userInfo.getUserId());
             return ResponseEntity
                     .ok()
                     .body(responseDTO);
@@ -61,9 +67,7 @@ public class TodoController {
 
     // 할 일 삭제 요청
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteTodo(
-            @PathVariable("id") String todoId
-    ) {
+    public ResponseEntity<?> deleteTodo(@PathVariable("id") String todoId) {
         log.info("/api/todos/{} DELETE request!", todoId);
 
         if (todoId == null || todoId.trim().equals("")) {
