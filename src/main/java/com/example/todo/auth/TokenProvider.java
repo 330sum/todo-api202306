@@ -24,7 +24,7 @@ public class TokenProvider {
     private String SECRET_KEY; // 서명은 노출되면 안되니까 yml에 설정
 
 
-    // 토큰 생성 (생김새ㅋㅋㅋㅋ)
+    // 토큰 생성 (생김새ㅋㅋㅋㅋ) - 안에 내용들을 클레임이라고 부름
         /*
                {
                     "iss": "딸긔공듀",
@@ -67,11 +67,11 @@ public class TokenProvider {
                         , SignatureAlgorithm.HS512
                 )
                 // token payload(body같음)에 들어갈 '클레임' 설정 (자주쓰는 것은 인텔리제이에 있음)
+                .setClaims(claims) // 커스텀으로 더 넣고 싶은거 (추가클레임) * 주의사항 * 추가클레임은 먼저 설정해야함
                 .setIssuer("바닐라겅듀") // iss: 발급자 정보 (회사이름, 서비스이름)
                 .setIssuedAt(new Date()) // iat: 토큰 발급시간
                 .setExpiration(expiry) // exp: 토큰만료시간
                 .setSubject(userEntity.getId()) // sub: 토큰을 식별할 수 있는 주요데이터
-                .setClaims(claims) // 커스텀으로 더 넣고 싶은거 (추가클레임)
                 .compact();
     }
 
