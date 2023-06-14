@@ -104,7 +104,7 @@ public class UserService {
         User foundUser = userRepository.findById(userInfo.getUserId())
                 .orElseThrow(() -> new NoRegisteredArgumentsException("회원조회에 실패!"));
 
-        // 일반회원이 아니면 예외
+        // 일반회원이 아니면 예외 -> 이거는 씹힘 (controller에서 @PreAuthorize 여기에서 403으로 쳐냄)
         if(userInfo.getRole() != Role.COMMON) {
             throw new IllegalStateException("일반회원이 아니면 등급을 상승시킬 수 없습니당!");
         }
