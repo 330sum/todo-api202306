@@ -9,7 +9,6 @@ import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.StringTokenizer;
 
-@Setter
 @Getter
 @ToString
 @EqualsAndHashCode(of = "id")
@@ -43,6 +42,13 @@ public class User {
 //    @ColumnDefault("'COMMON'") // @ColumnDefault은 항상 "" string임. 근데enum인 경우 반드시 '' 홑따옴표로 감싸줘야함!!!!!!!!!!!!!!!!!!!!!!
     @Builder.Default
     private Role role = Role.COMMON; // 유저 권한
+
+
+    // 세터를 만들지말고 등급 수정메서드를 따로 만듦!!!
+    // 생겨먹은건 세턴데, 실무에서는 세터 절대 쓰지 말것!
+    public void changeRole(Role role) {
+        this.role = role;
+    }
 
 //    public void test() {
 //        String test = "";

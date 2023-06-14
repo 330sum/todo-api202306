@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -16,6 +17,8 @@ import org.springframework.web.filter.CorsFilter;
 //@Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
+// ↓ 자동 권한검사를 수행하기위한 설정을 해야함!
+@EnableGlobalMethodSecurity(prePostEnabled = true)
 public class WebSecurityConfig {
 
     private final JwtAuthFilter jwtAuthFilter; // 10. 내가 만든 토큰검사용 필터 셋팅
@@ -40,8 +43,9 @@ public class WebSecurityConfig {
                 .and() // 그리고
                 // ↓ 12. 어떤 요청에서 인가를 할것인지, 안할 것인지 설정
                 .authorizeRequests() // 인가요청들
+                    .antMatchers(HttpMethod.PUT, "/api/auth/promote").authenticated() // 이 요청오면 인증받게해라
                     .antMatchers("/", "/api/auth/**").permitAll() // 이 요청은 그냥 허용한다 (.denyAll()은 모두 거절한다)
-                    //.antMatchers(HttpMethod.POST, "/api/todos").hasRole("ADMIN") // 이 요청은 ADMIN 역할만 허용
+                //.antMatchers(HttpMethod.POST, "/api/todos").hasRole("ADMIN") // 이 요청은 ADMIN 역할만 허용
                 .anyRequest().authenticated() // 그 외 나머지 요청들은 다 인증받아라
         ;
 

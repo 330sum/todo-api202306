@@ -1,5 +1,6 @@
 package com.example.todo.userapi.api;
 
+import com.example.todo.auth.TokenUserInfo;
 import com.example.todo.exception.DuplcatedEmailException;
 import com.example.todo.exception.NoRegisteredArgumentsException;
 import com.example.todo.userapi.dto.request.LoginRequestDTO;
@@ -10,6 +11,8 @@ import com.example.todo.userapi.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -78,6 +81,27 @@ public class UserController {
 
     }
 
+
+    // 일반 회원을 프리미엄회원으로 승격하는 요청 처리
+    @PutMapping("/promote")
+    // 권한검사 필요한곳에 @PreAuthorize - 해당권한이 아니면 인가처리 거부함 403리터함
+    @PreAuthorize("hasRole('ROLE_COMMON')") // 커먼이 아닌 사람이 보내면 403보냄. 그래서 서비스에서 따로 예외처리 안만들어도 됨
+    public ResponseEntity<?> promote(@AuthenticationPrincipal TokenUserInfo userInfo) {
+        log.info("/api/auth/promote PUT!");
+
+        try {
+             LoginResponseDTO responseDTO = userService.promoteToPremium(userInfo);
+            // 서비스가 할 일 1. 인증처리필요 (->TokenUserInfo 넘겨주기), 2. 프리미엄이 또 프리미엄해달라고 하면 안됨. (커먼인지 확인하기)
+            // 권한바꾸기 (localStorage변경 -> jwt 토큰 재생성해서 다시 줘야함 -> 토큰들어있는 DTO로 리턴받아야함)
+            return ResponseEntity.ok().body(responseDTO);
+        } catch (IllegalStateException e) {
+            e.printStackTrace();
+            log.warn(e.getMessage());
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
+        }
+    }
 
 
 }
