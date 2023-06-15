@@ -44,6 +44,7 @@ public class WebSecurityConfig {
                 // ↓ 12. 어떤 요청에서 인가를 할것인지, 안할 것인지 설정
                 .authorizeRequests() // 인가요청들
                     .antMatchers(HttpMethod.PUT, "/api/auth/promote").authenticated() // 이 요청오면 인증받게해라
+                    .antMatchers("/api/auth/load-profile").authenticated()
                     .antMatchers("/", "/api/auth/**").permitAll() // 이 요청은 그냥 허용한다 (.denyAll()은 모두 거절한다)
                 //.antMatchers(HttpMethod.POST, "/api/todos").hasRole("ADMIN") // 이 요청은 ADMIN 역할만 허용
                 .anyRequest().authenticated() // 그 외 나머지 요청들은 다 인증받아라
