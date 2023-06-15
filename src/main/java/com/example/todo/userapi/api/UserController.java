@@ -10,13 +10,19 @@ import com.example.todo.userapi.dto.response.UserSignUpResponseDTO;
 import com.example.todo.userapi.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.util.FileCopyUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.io.File;
+import java.io.IOException;
 
 @RestController
 @Slf4j
@@ -119,6 +125,71 @@ public class UserController {
         } catch (Exception e) {
             return ResponseEntity.internalServerError().build();
         }
+    }
+
+
+    // 프로필 사진 이미지 데이터를 클라이언트에게 응답처리
+    @GetMapping("/load-profile")
+    public ResponseEntity<?> loadFile(
+            @AuthenticationPrincipal TokenUserInfo userInfo) {
+        log.info("/api/auth/load-profile GET! - user {}", userInfo.getEmail());
+
+        try {
+            // 클라이언트가 요청한 프로필 사진 응답해야함
+            // 1. 프로필 사진의 경로를 얻어야 함 (디비에서 찾기)
+            String filePath = userService.getProfilePath(userInfo.getUserId());
+
+            // 2. 얻어낸 파일 경로를 통해서 실제파일 가져오기 (파일데이터 로드하기)
+            // 파일객체로 포장하기
+            File profileFile = new File(filePath);
+
+            if (!profileFile.exists()) {
+                return ResponseEntity.notFound().build();
+            }
+
+            // 해당 경로에 저장된 파일를 바이트배열로 직렬화해서 리턴해주는 기능 (여러개면 모아서 리스트로 줘야함...! 아니면 이런 요청을 여러번 보내거나..)
+            byte[] fileData = FileCopyUtils.copyToByteArray(profileFile);
+
+            // 3. 응답헤서에 컨텐츠 타입을 성정
+            HttpHeaders headers = new HttpHeaders();
+            MediaType contentType = findExtensionAndGetMediaType(filePath);
+
+            if (contentType == null) {
+                return ResponseEntity.internalServerError()
+                        .body("발견된 파일은 이미지가 아님!!!!!!");
+            }
+
+            headers.setContentType(contentType);
+
+            return ResponseEntity.ok()
+                    .headers(headers)
+                    .body(fileData);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            return ResponseEntity.internalServerError()
+                    .body("파일을 찾을 수 없슘둥..");
+
+        }
+    }
+
+    private MediaType findExtensionAndGetMediaType(String filePath) {
+
+        // 파일경로에서 확장자 추출하기
+        String ext = filePath.substring(filePath.lastIndexOf(".") + 1);
+        switch (ext.toUpperCase()) {
+            case "JPEG":
+            case "JPG":
+                return MediaType.IMAGE_JPEG;
+            case "PNG":
+                return MediaType.IMAGE_PNG;
+            case "GIF":
+                return MediaType.IMAGE_GIF;
+            default:
+                return null;
+
+        }
+
     }
 
 
