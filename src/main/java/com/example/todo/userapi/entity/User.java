@@ -43,6 +43,9 @@ public class User {
     @Builder.Default
     private Role role = Role.COMMON; // 유저 권한
 
+    private String profileImg;
+
+
 
     // 세터를 만들지말고 등급 수정메서드를 따로 만듦!!!
     // 생겨먹은건 세턴데, 실무에서는 세터 절대 쓰지 말것!
