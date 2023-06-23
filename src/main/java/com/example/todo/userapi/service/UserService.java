@@ -170,10 +170,5 @@ public class UserService {
 
     }
 
-    public String getProfilePath(String userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow();
-        return uploadRootPath + "/" + user.getProfileImg();
 
-    }
 }
