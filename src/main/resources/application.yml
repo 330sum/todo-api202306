@@ -42,7 +42,7 @@ upload:
 # s3 접근 설정
 aws:
   credentials:
-    accessKey: AKIATHU4JAJ2SXOKXS2G
-    secretKey: 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
-  region: ap-northeast-2
-  bucketName: 330-special-bucket
+    accessKey:
+    secretKey:
+  region:
+  bucketName:
